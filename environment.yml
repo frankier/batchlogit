@@ -1,5 +1,6 @@
 name: batchlogit
 channels:
+  - rapidsai-nightly
   - nvidia 
   - pytorch 
   - conda-forge 
