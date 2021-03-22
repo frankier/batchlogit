@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: textbook/git-checkout-submodule-action@master
 
-      - name: Build/push web
+      - name: Build/push batchlogit
         uses: whoan/docker-build-with-cache-action@v5
         with:
           registry: ghcr.io
