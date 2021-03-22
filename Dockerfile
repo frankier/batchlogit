@@ -30,8 +30,10 @@ WORKDIR /opt/batchlogit
 
 RUN micromamba install -y \
        -n base \
+       -c nvidia \
        -c conda-forge \
-       python=3.8.8
+       python=3.8.8 \
+       'cudatoolkit=10.2'
 
 COPY environment.yml ./
 
