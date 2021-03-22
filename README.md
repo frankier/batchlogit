@@ -7,5 +7,5 @@ logistic regression models.
 
 This repository contains vendorised code from the following repositories:
 
-https://github.com/hjmshi/PyTorch-LBFGS
-https://github.com/nlesc-dirac/pytorch
+ * https://github.com/hjmshi/PyTorch-LBFGS
+ * https://github.com/nlesc-dirac/pytorch
