@@ -22,6 +22,13 @@ jobs:
     if: github.event_name == 'push'
 
     steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
+
       - uses: actions/checkout@v2
       - uses: textbook/git-checkout-submodule-action@master
 
