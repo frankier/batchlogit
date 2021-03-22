@@ -1,9 +1,11 @@
 run() {
   echo "$*"
-  python -m embed_nn.logit $*
+  python -m batchlogit.cmd $*
 }
 
 echo " ** CPU ** "
+run --n-jobs=1 cuml_joblib_threading
+run --n-jobs=10 cuml_joblib_threading
 run pytorch_lgfbs_serial
 run --n-jobs=10 pytorch_lgfbs_chunk
 run --n-jobs=10 skl_joblib_loky
