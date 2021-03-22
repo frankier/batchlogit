@@ -1,7 +1,6 @@
 import torch
 from joblib import Parallel, delayed
 from more_itertools import chunked
-from torch import nn
 
 
 class JoblibRunner:

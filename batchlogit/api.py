@@ -1,6 +1,11 @@
-from .methods import (lr_many_pytorch_lgfbs, lr_one_cuml,
-                      lr_one_nlesc_dirac_lbgfs, lr_one_pytorch_hjmshi_lgfbs,
-                      lr_one_pytorch_lgfbs, lr_one_skl)
+from .methods import (
+    lr_many_pytorch_lgfbs,
+    lr_one_cuml,
+    lr_one_nlesc_dirac_lbgfs,
+    lr_one_pytorch_hjmshi_lgfbs,
+    lr_one_pytorch_lgfbs,
+    lr_one_skl,
+)
 from .runners import ChunkRunner, JoblibRunner, PyTorchMpPool, SerialRunner
 
 METHODS = [
