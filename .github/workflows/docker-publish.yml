@@ -1,0 +1,35 @@
+name: Docker
+
+on:
+  push:
+    # Publish `main` as Docker `latest` image.
+    branches:
+      - main
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+  # Run tests for any PRs.
+  pull_request:
+
+jobs:
+  build_publish_containers:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_OPTS: "--registry-mirror=https://mirror.gcr.io"
+
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: textbook/git-checkout-submodule-action@master
+
+      - name: Build/push web
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          registry: ghcr.io
+          image_name: frankier/batchlogit
+          dockerfile: Dockerfile
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
