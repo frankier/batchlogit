@@ -31,6 +31,8 @@ RUN micromamba install -y \
        -c conda-forge \
        python=3.8.8
 
+COPY environment.yml ./
+
 RUN micromamba install -y \
        -n base \
        -c rapidsai-nightly \
