@@ -168,7 +168,7 @@ def lr_one_nlesc_dirac_lbgfs(
     tol=1e-3,
     C=1,
 ):
-    from .nlesc_dirac_lbgfs import LBFGSNew
+    from .vendor.nlesc_dirac_lbgfs import LBFGSNew
 
     model = RegLogitModel(x.shape[-1], 1, C=C)
     optimizer = LBFGSNew(
@@ -210,7 +210,7 @@ def lr_one_pytorch_hjmshi_lgfbs(
 ):
     print("XXX: This seems to be broken currently.")
     # XXX: Currently broken
-    from .hjmshi_lbfgs import FullBatchLBFGS
+    from .vendor.hjmshi_lbfgs import FullBatchLBFGS
 
     model = RegLogitModel(x.shape[-1], 1, C=C)
     optimizer = FullBatchLBFGS(
