@@ -1,6 +1,4 @@
 import torch
-from joblib import Parallel, delayed
-from more_itertools import chunked
 from torch import nn
 
 
@@ -58,7 +56,9 @@ class StackedRegLogitModel(torch.nn.Module):
         y_hat_logit = self(x)
         model_loss = self.loss_fn(y_hat_logit[:, :, 0], y)
         # Don't regularize bias to match scikit-learn/cuml
-        l2_reg = 0.5 * sum((torch.mm(linear.weight, linear.weight.t()) for linear in self.linears))
+        l2_reg = 0.5 * sum(
+            (torch.mm(linear.weight, linear.weight.t()) for linear in self.linears)
+        )
         return model_loss + l2_reg / self.C
 
 
@@ -81,13 +81,7 @@ class RegLogitModel(nn.Module):
 
 
 def lr_many_pytorch_lgfbs(
-    x,
-    y,
-    history_size=10,
-    max_iter=100,
-    max_ls=25,
-    tol=1e-4,
-    C=1,
+    x, y, history_size=10, max_iter=100, max_ls=25, tol=1e-4, C=1,
 ):
     from torch.optim import LBFGS
 
@@ -220,10 +214,7 @@ def lr_one_pytorch_hjmshi_lgfbs(
 
     model = RegLogitModel(x.shape[-1], 1, C=C)
     optimizer = FullBatchLBFGS(
-        model.parameters(),
-        lr=1,
-        history_size=history_size,
-        line_search="Wolfe",
+        model.parameters(), lr=1, history_size=history_size, line_search="Wolfe",
     )
 
     x_var = x.detach()
@@ -235,6 +226,7 @@ def lr_one_pytorch_hjmshi_lgfbs(
         return loss
 
     loss = closure()
+    loss.backward()
     n_iter = 1
     while 1:
         options = {
