@@ -1,5 +1,18 @@
-from .runners import JoblibRunner, ChunkRunner, PyTorchMpPool, SerialRunner
-from .methods import lr_one_cuml, lr_many_pytorch_lgfbs, lr_one_pytorch_lgfbs, lr_one_nlesc_dirac_lbgfs, lr_one_pytorch_hjmshi_lgfbs, lr_one_skl
+from .methods import (lr_many_pytorch_lgfbs, lr_one_cuml,
+                      lr_one_nlesc_dirac_lbgfs, lr_one_pytorch_hjmshi_lgfbs,
+                      lr_one_pytorch_lgfbs, lr_one_skl)
+from .runners import ChunkRunner, JoblibRunner, PyTorchMpPool, SerialRunner
+
+METHODS = [
+    "cuml_joblib_threading",
+    "pytorch_lgfbs_chunk",
+    "pytorch_lgfbs_mp",
+    "pytorch_lgfbs_serial",
+    "pytorch_nlesc_dirac_lbgfs_serial",
+    "pytorch_hjmshi_lgfbs_serial",
+    "skl_joblib_loky",
+    "skl_serial",
+]
 
 
 def logit_runner_by_name(name, n_jobs=None):

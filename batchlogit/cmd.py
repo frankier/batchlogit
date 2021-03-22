@@ -5,13 +5,14 @@ from joblib import Parallel, delayed
 from more_itertools import chunked
 from torch import nn
 
-click_log.basic_config()
+from .api import METHODS
 
+click_log.basic_config()
 
 
 @click.command()
 @click_log.simple_verbosity_option()
-@click.argument("method")
+@click.argument("method", type=click.Choice(METHODS))
 @click.argument("outfn", required=False)
 @click.option("--n-jobs", type=int)
 @click.option("--device", default="cpu", type=click.Choice(["cpu", "gpu"]))
@@ -22,6 +23,7 @@ def main(method, outfn, n_jobs, device):
         if device == "cpu":
             from numpy.random import RandomState
             from sklearn.datasets import make_classification
+
             rng = RandomState(42)
 
             def transform_tensor(t):
@@ -39,8 +41,9 @@ def main(method, outfn, n_jobs, device):
         else:
             from cuml.datasets import make_classification
             from cupy.random import RandomState
+
             rng = RandomState(42)
-            device_obj = torch.device('cuda')
+            device_obj = torch.device("cuda")
 
             def transform_tensor(t):
                 res = torch.as_tensor(t, dtype=torch.float32, device=device_obj)
