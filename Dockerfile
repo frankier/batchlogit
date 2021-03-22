@@ -1,5 +1,7 @@
 FROM debian:bullseye-slim
 
+LABEL org.opencontainers.image.source https://github.com/frankier/batchlogit
+
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive \
     apt-get dist-upgrade -yq && \
