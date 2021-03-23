@@ -80,7 +80,7 @@ class RegLogitModel(nn.Module):
         return model_loss + l2_reg / self.C
 
 
-def lr_many_pytorch_lgfbs(
+def lr_many_pytorch_lbfgs(
     x, y, history_size=10, max_iter=100, max_ls=25, tol=1e-4, C=1,
 ):
     from torch.optim import LBFGS
@@ -119,7 +119,7 @@ def lr_many_pytorch_lgfbs(
     return (torch.stack(weights, axis=0), torch.stack(biases, axis=0), state["n_iter"])
 
 
-def lr_one_pytorch_lgfbs(
+def lr_one_pytorch_lbfgs(
     x: torch.tensor,
     y: torch.tensor,
     history_size=10,
@@ -199,7 +199,7 @@ def lr_one_nlesc_dirac_lbgfs(
     return (model.linear.weight.detach(), model.linear.bias.detach(), state["n_iter"])
 
 
-def lr_one_pytorch_hjmshi_lgfbs(
+def lr_one_pytorch_hjmshi_lbfgs(
     x: torch.tensor,
     y: torch.tensor,
     history_size=10,
@@ -248,9 +248,9 @@ def lr_one_pytorch_hjmshi_lgfbs(
         grad_max = grad.abs().max()
 
         if fail:
-            raise RuntimeError("Optimizer failure in lr_one_pytorch_hjmshi_lgfbs", fail)
+            raise RuntimeError("Optimizer failure in lr_one_pytorch_hjmshi_lbfgs", fail)
         elif torch.isnan(loss):
-            raise RuntimeError("NaN loss in lr_one_pytorch_hjmshi_lgfbs")
+            raise RuntimeError("NaN loss in lr_one_pytorch_hjmshi_lbfgs")
         elif grad_max < tol or n_iter == max_iter:
             return (model.linear.weight.detach(), model.linear.bias.detach(), n_iter)
         n_iter += 1
