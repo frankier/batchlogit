@@ -10,6 +10,7 @@ from .runners import ChunkRunner, JoblibRunner, PyTorchMpPool, SerialRunner
 
 METHODS = [
     "cuml_joblib_threading",
+    "cuml_joblib_loky",
     "pytorch_lgfbs_chunk",
     "pytorch_lgfbs_mp",
     "pytorch_lgfbs_serial",
@@ -23,6 +24,8 @@ METHODS = [
 def logit_runner_by_name(name, n_jobs=None):
     if name == "cuml_joblib_threading":
         return JoblibRunner(lr_one_cuml, n_jobs=n_jobs, backend="threading")
+    elif name == "cuml_joblib_loky":
+        return JoblibRunner(lr_one_cuml, n_jobs=n_jobs)
     elif name == "pytorch_lgfbs_chunk":
         return ChunkRunner(lr_many_pytorch_lgfbs, chunk_size=n_jobs)
     elif name == "pytorch_lgfbs_mp":
