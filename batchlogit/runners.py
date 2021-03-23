@@ -148,4 +148,8 @@ class CopyWrapper:
 
         max_lr_fit_n_iters, weights, biases = self.runner(wrapped_it())
         assert initial_device is not None
-        return max_lr_fit_n_iters, weights.to(initial_device), biases.to(initial_device)
+        return (
+            max_lr_fit_n_iters,
+            [weight.to(initial_device) for weight in weights],
+            [bias.to(initial_device) for bias in biases],
+        )
