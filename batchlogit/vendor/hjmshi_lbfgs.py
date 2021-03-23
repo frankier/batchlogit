@@ -1,7 +1,6 @@
 from copy import deepcopy
 from functools import reduce
 
-import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from torch.optim import Optimizer
@@ -20,7 +19,7 @@ def is_legal(v):
     return legal
 
 
-def polyinterp(points, x_min_bound=None, x_max_bound=None, plot=False):
+def polyinterp(points, x_min_bound=None, x_max_bound=None):
     """
     Gives the minimizer and minimum of the interpolating polynomial over given points
     based on function and derivative information. Defaults to bisection if no critical
@@ -36,7 +35,6 @@ def polyinterp(points, x_min_bound=None, x_max_bound=None, plot=False):
         points (nparray): two-dimensional array with each point of form [x f g]
         x_min_bound (float): minimum value that brackets minimum (default: minimum of points)
         x_max_bound (float): maximum value that brackets minimum (default: maximum of points)
-        plot (bool): plot interpolating polynomial
 
     Outputs:
         x_sol (float): minimizer of interpolating polynomial
@@ -59,7 +57,7 @@ def polyinterp(points, x_min_bound=None, x_max_bound=None, plot=False):
         x_max_bound = x_max
 
     # explicit formula for quadratic interpolation
-    if no_points == 2 and order == 2 and plot is False:
+    if no_points == 2 and order == 2:
         # Solution to quadratic interpolation is given by:
         # a = -(f1 - f2 - g1(x1 - x2))/(x1 - x2)^2
         # x_min = x1 - g1/(2a)
@@ -86,7 +84,7 @@ def polyinterp(points, x_min_bound=None, x_max_bound=None, plot=False):
         x_sol = np.minimum(np.maximum(x_min_bound, x_sol), x_max_bound)
 
     # explicit formula for cubic interpolation
-    elif no_points == 2 and order == 3 and plot is False:
+    elif no_points == 2 and order == 3:
         # Solution to cubic interpolation is given by:
         # d1 = g1 + g2 - 3((f1 - f2)/(x1 - x2))
         # d2 = sqrt(d1^2 - g1*g2)
@@ -162,15 +160,6 @@ def polyinterp(points, x_min_bound=None, x_max_bound=None, plot=False):
                     if np.isreal(F_cp) and F_cp < f_min:
                         x_sol = np.real(crit_pt)
                         f_min = np.real(F_cp)
-
-            if plot:
-                plt.figure()
-                x = np.arange(
-                    x_min_bound, x_max_bound, (x_max_bound - x_min_bound) / 10000
-                )
-                f = np.polyval(coeff, x)
-                plt.plot(x, f)
-                plt.plot(x_sol, f_min, "x")
 
     return x_sol
 
