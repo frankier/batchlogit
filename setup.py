@@ -14,7 +14,7 @@ setuptools.setup(
         "scikit-learn>=0.24.1",
         "click>=7.1.2",
         "click-log>=0.3.2",
-        "pytorch>=1.8.0",
+        "torch>=1.8.0",
     ],
     classifiers=[
         "Programming Language :: Python",
