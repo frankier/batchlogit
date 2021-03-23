@@ -9,6 +9,7 @@ from .methods import (
 from .runners import ChunkRunner, JoblibRunner, PyTorchMpPool, SerialRunner
 
 METHODS = [
+    "cuml_joblib_serial",
     "cuml_joblib_threading",
     "cuml_joblib_loky",
     "pytorch_lgfbs_chunk",
@@ -22,7 +23,9 @@ METHODS = [
 
 
 def logit_runner_by_name(name, n_jobs=None):
-    if name == "cuml_joblib_threading":
+    if name == "cuml_joblib_serial":
+        return SerialRunner(lr_one_cuml)
+    elif name == "cuml_joblib_threading":
         return JoblibRunner(lr_one_cuml, n_jobs=n_jobs, backend="threading")
     elif name == "cuml_joblib_loky":
         return JoblibRunner(lr_one_cuml, n_jobs=n_jobs)
