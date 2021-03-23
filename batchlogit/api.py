@@ -6,7 +6,7 @@ from .methods import (
     lr_one_pytorch_lbfgs,
     lr_one_skl,
 )
-from .runners import ChunkRunner, JoblibRunner, PyTorchMpPool, SerialRunner
+from .runners import ChunkRunner, CopyWrapper, JoblibRunner, PyTorchMpPool, SerialRunner
 
 METHODS = [
     "cuml_joblib_serial",
@@ -22,13 +22,16 @@ METHODS = [
 ]
 
 
-def logit_runner_by_name(name, n_jobs=None):
+def logit_runner_by_name(name, n_jobs=None, device=None):
     if name == "cuml_joblib_serial":
-        return SerialRunner(lr_one_cuml)
+        return CopyWrapper(SerialRunner(lr_one_cuml), device or "cuda")
     elif name == "cuml_joblib_threading":
-        return JoblibRunner(lr_one_cuml, n_jobs=n_jobs, backend="threading")
+        return CopyWrapper(
+            JoblibRunner(lr_one_cuml, n_jobs=n_jobs, backend="threading"),
+            device or "cuda",
+        )
     elif name == "cuml_joblib_loky":
-        return JoblibRunner(lr_one_cuml, n_jobs=n_jobs)
+        return CopyWrapper(JoblibRunner(lr_one_cuml, n_jobs=n_jobs), device or "cuda")
     elif name == "pytorch_lbfgs_chunk":
         return ChunkRunner(lr_many_pytorch_lbfgs, chunk_size=n_jobs)
     elif name == "pytorch_lbfgs_mp":
@@ -40,7 +43,7 @@ def logit_runner_by_name(name, n_jobs=None):
     elif name == "pytorch_hjmshi_lbfgs_serial":
         return SerialRunner(lr_one_pytorch_hjmshi_lbfgs)
     elif name == "skl_joblib_loky":
-        return JoblibRunner(lr_one_skl, n_jobs=n_jobs)
+        return CopyWrapper(JoblibRunner(lr_one_skl, n_jobs=n_jobs), device or "cpu")
     else:
         assert name == "skl_serial"
-        return SerialRunner(lr_one_skl)
+        return CopyWrapper(SerialRunner(lr_one_skl), device or "cpu")

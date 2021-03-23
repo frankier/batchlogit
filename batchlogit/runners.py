@@ -119,3 +119,26 @@ class ChunkRunner:
             weights.append(weight)
             biases.append(bias)
         return max_lr_fit_n_iters, weights, biases
+
+
+class CopyWrapper:
+    def __init__(self, runner, device_name):
+        self.runner = runner
+        self.device = torch.device(device_name)
+
+    def stop(self):
+        self.runner.stop()
+
+    def __call__(self, prob_it):
+        initial_device = None
+
+        def wrapped_it():
+            nonlocal initial_device
+            for feats_support, gt_support in prob_it:
+                if initial_device is None:
+                    initial_device = feats_support.device
+                yield feats_support.to(self.device), gt_support.to(self.device)
+
+        max_lr_fit_n_iters, weights, biases = self.runner(wrapped_it())
+        assert initial_device is not None
+        return max_lr_fit_n_iters, weights.to(initial_device), biases.to(initial_device)

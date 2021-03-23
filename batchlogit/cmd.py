@@ -23,16 +23,9 @@ def main(method, outfn, n_jobs, device):
 
             rng = RandomState(42)
 
-            def transform_tensor(t):
-                res = torch.as_tensor(t, dtype=torch.float32)
-                if method.startswith("cuml_"):
-                    return res.cuda()
-                else:
-                    return res
-
             for _ in range(1024):
                 yield [
-                    transform_tensor(t)
+                    torch.as_tensor(t, dtype=torch.float32)
                     for t in make_classification(40, 10, random_state=rng)
                 ]
         else:
@@ -42,16 +35,9 @@ def main(method, outfn, n_jobs, device):
             rng = RandomState(42)
             device_obj = torch.device("cuda")
 
-            def transform_tensor(t):
-                res = torch.as_tensor(t, dtype=torch.float32, device=device_obj)
-                if method.startswith("skl_"):
-                    return res.cpu()
-                else:
-                    return res
-
             for _ in range(1024):
                 yield [
-                    transform_tensor(t)
+                    torch.as_tensor(t, dtype=torch.float32, device=device_obj)
                     for t in make_classification(40, 10, random_state=rng)
                 ]
 
