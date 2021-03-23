@@ -50,6 +50,11 @@ The benchmark was run on [1/4 of a CSC Puhti GPU
 machine](https://docs.csc.fi/computing/systems-puhti/). That means ~10 cores,
 90GiB memory and 1 V100 GPU.
 
+This benchmark should in no way be taken as definitive, since it has some
+obvious caveats from the starts, such as the fact other things, like the
+creation of the benchmark problems are also being measured. PRs and alternative
+numbers/interpretations welcome.
+
 ### Results
 
 ```
