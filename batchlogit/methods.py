@@ -14,7 +14,14 @@ def lr_one_skl(x: torch.tensor, y: torch.tensor):
     with warnings.catch_warnings():
 
         warnings.simplefilter("ignore", ConvergenceWarning)
-        model = model.fit(x, y)
+        try:
+            model = model.fit(x, y)
+        except ValueError as exc:
+            if exc.args[0].startswith(
+                "This solver needs samples of at least 2 classes"
+            ):
+                return None
+            raise exc
     weight = model.coef_
     bias = model.intercept_
     weight = torch.as_tensor(weight, dtype=torch.float32, device=initial_device)

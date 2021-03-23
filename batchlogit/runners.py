@@ -22,7 +22,10 @@ class JoblibRunner:
         max_lr_fit_n_iters = 0
         weights = []
         biases = []
-        for weight, bias, lr_fit_n_iters in self.parallel(logits_delayed):
+        for result in self.parallel(logits_delayed):
+            if result is None:
+                continue
+            weight, bias, lr_fit_n_iters = result
             if lr_fit_n_iters > max_lr_fit_n_iters:
                 max_lr_fit_n_iters = lr_fit_n_iters
             weights.append(weight)
@@ -65,7 +68,10 @@ class PyTorchMpPool:
         weights = []
         biases = []
         results = self.parallel.imap_unordered(self._lr_one, prob_it)
-        for weight, bias, lr_fit_n_iters in results:
+        for result in results:
+            if result is None:
+                continue
+            weight, bias, lr_fit_n_iters = result
             if lr_fit_n_iters > max_lr_fit_n_iters:
                 max_lr_fit_n_iters = lr_fit_n_iters
             weights.append(weight)
@@ -85,9 +91,10 @@ class SerialRunner:
         weights = []
         biases = []
         for feats_support, gt_support in prob_it:
-            weight, bias, lr_fit_n_iters = self.logistic_regression(
-                feats_support, gt_support
-            )
+            result = self.logistic_regression(feats_support, gt_support)
+            if result is None:
+                continue
+            weight, bias, lr_fit_n_iters = result
             if lr_fit_n_iters > max_lr_fit_n_iters:
                 max_lr_fit_n_iters = lr_fit_n_iters
             weights.append(weight)
