@@ -85,7 +85,7 @@ def lr_many_pytorch_lgfbs(
 ):
     from torch.optim import LBFGS
 
-    model = StackedRegLogitModel(x.shape[0], x.shape[-1], 1, C=C)
+    model = StackedRegLogitModel(x.shape[0], x.shape[-1], 1, C=C).to(x.device)
     optimizer = LBFGS(
         model.parameters(),
         lr=1,
@@ -130,7 +130,7 @@ def lr_one_pytorch_lgfbs(
 ):
     from torch.optim import LBFGS
 
-    model = RegLogitModel(x.shape[-1], 1, C=C)
+    model = RegLogitModel(x.shape[-1], 1, C=C).to(x.device)
     optimizer = LBFGS(
         model.parameters(),
         lr=1,
@@ -170,7 +170,7 @@ def lr_one_nlesc_dirac_lbgfs(
 ):
     from .vendor.nlesc_dirac_lbgfs import LBFGSNew
 
-    model = RegLogitModel(x.shape[-1], 1, C=C)
+    model = RegLogitModel(x.shape[-1], 1, C=C).to(x.device)
     optimizer = LBFGSNew(
         model.parameters(),
         lr=1,
@@ -212,7 +212,7 @@ def lr_one_pytorch_hjmshi_lgfbs(
     # XXX: Currently broken
     from .vendor.hjmshi_lbfgs import FullBatchLBFGS
 
-    model = RegLogitModel(x.shape[-1], 1, C=C)
+    model = RegLogitModel(x.shape[-1], 1, C=C).to(x.device)
     optimizer = FullBatchLBFGS(
         model.parameters(), lr=1, history_size=history_size, line_search="Wolfe",
     )
