@@ -17,6 +17,7 @@ run pytorch_hjmshi_lgfbs_serial
 run --n-jobs=10 skl_joblib_loky
 run skl_serial
 
+echo
 echo " ** GPU ** "
 run --device gpu cuml_joblib_serial cuml.pt
 run --device gpu --n-jobs=10 cuml_joblib_threading
