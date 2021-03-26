@@ -2,7 +2,7 @@ import torch
 from torch import nn
 
 
-def lr_one_skl(x: torch.tensor, y: torch.tensor):
+def lr_one_skl(x: torch.tensor, y: torch.tensor, **kwargs):
     import warnings
 
     from sklearn.exceptions import ConvergenceWarning
@@ -10,7 +10,7 @@ def lr_one_skl(x: torch.tensor, y: torch.tensor):
 
     initial_device = x.device
     x = x.detach()
-    model = LogisticRegression()
+    model = LogisticRegression(**kwargs)
     with warnings.catch_warnings():
 
         warnings.simplefilter("ignore", ConvergenceWarning)
@@ -30,13 +30,13 @@ def lr_one_skl(x: torch.tensor, y: torch.tensor):
     return weight, bias, n_iter
 
 
-def lr_one_cuml(x: torch.tensor, y: torch.tensor):
+def lr_one_cuml(x: torch.tensor, y: torch.tensor, **kwargs):
     from cuml.linear_model import LogisticRegression
 
     initial_device = x.device
     x = x.detach()
     y = y.float()
-    model = LogisticRegression()
+    model = LogisticRegression(**kwargs)
     model = model.fit(x, y)
     weight = model.coef_
     bias = model.intercept_

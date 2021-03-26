@@ -13,11 +13,11 @@ class JoblibRunner:
         if self.parallel is not None:
             self._parallel_pool.__exit__(None, None, None)
 
-    def __call__(self, prob_it):
+    def __call__(self, prob_it, **kwargs):
         logits_delayed = []
         for feats_support, gt_support in prob_it:
             logits_delayed.append(
-                delayed(self.logistic_regression)(feats_support, gt_support)
+                delayed(self.logistic_regression)(feats_support, gt_support, **kwargs)
             )
         max_lr_fit_n_iters = 0
         weights = []
@@ -42,6 +42,7 @@ class PyTorchMpPool:
         ctx = multiprocessing.get_context("spawn")
         self._pool = ctx.Pool(**kwargs)
         self.parallel = self._pool.__enter__()
+        self.kwargs = {}
 
     def __getstate__(self):
         """
@@ -59,14 +60,15 @@ class PyTorchMpPool:
     def _lr_one(self, xy):
         from torch.cuda import empty_cache
 
-        res = self.logistic_regression(*xy)
+        res = self.logistic_regression(*xy, **self.kwargs)
         empty_cache()
         return res
 
-    def __call__(self, prob_it):
+    def __call__(self, prob_it, **kwargs):
         max_lr_fit_n_iters = 0
         weights = []
         biases = []
+        self.kwargs = kwargs
         results = self.parallel.imap_unordered(self._lr_one, prob_it)
         for result in results:
             if result is None:
@@ -86,12 +88,12 @@ class SerialRunner:
     def stop(self):
         pass
 
-    def __call__(self, prob_it):
+    def __call__(self, prob_it, **kwargs):
         max_lr_fit_n_iters = 0
         weights = []
         biases = []
         for feats_support, gt_support in prob_it:
-            result = self.logistic_regression(feats_support, gt_support)
+            result = self.logistic_regression(feats_support, gt_support, **kwargs)
             if result is None:
                 continue
             weight, bias, lr_fit_n_iters = result
@@ -112,14 +114,16 @@ class ChunkRunner:
     def stop(self):
         pass
 
-    def __call__(self, prob_it):
+    def __call__(self, prob_it, **kwargs):
         max_lr_fit_n_iters = 0
         weights = []
         biases = []
         for chunk in chunked(prob_it, self.chunk_size):
             feats_support, gt_support = zip(*chunk)
             weight, bias, lr_fit_n_iters = self.logistic_regression(
-                torch.stack(feats_support, axis=0), torch.stack(gt_support, axis=0)
+                torch.stack(feats_support, axis=0),
+                torch.stack(gt_support, axis=0),
+                **kwargs,
             )
             if lr_fit_n_iters > max_lr_fit_n_iters:
                 max_lr_fit_n_iters = lr_fit_n_iters
@@ -136,7 +140,7 @@ class CopyWrapper:
     def stop(self):
         self.runner.stop()
 
-    def __call__(self, prob_it):
+    def __call__(self, prob_it, **kwargs):
         initial_device = None
 
         def wrapped_it():
@@ -146,7 +150,7 @@ class CopyWrapper:
                     initial_device = feats_support.device
                 yield feats_support.to(self.device), gt_support.to(self.device)
 
-        max_lr_fit_n_iters, weights, biases = self.runner(wrapped_it())
+        max_lr_fit_n_iters, weights, biases = self.runner(wrapped_it(), **kwargs)
         assert initial_device is not None
         return (
             max_lr_fit_n_iters,
