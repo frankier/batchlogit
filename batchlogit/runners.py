@@ -19,18 +19,17 @@ class JoblibRunner:
             logits_delayed.append(
                 delayed(self.logistic_regression)(feats_support, gt_support, **kwargs)
             )
-        max_lr_fit_n_iters = 0
+        fit_n_iters_list = []
         weights = []
         biases = []
         for result in self.parallel(logits_delayed):
             if result is None:
                 continue
             weight, bias, lr_fit_n_iters = result
-            if lr_fit_n_iters > max_lr_fit_n_iters:
-                max_lr_fit_n_iters = lr_fit_n_iters
+            fit_n_iters_list.append(lr_fit_n_iters)
             weights.append(weight)
             biases.append(bias)
-        return max_lr_fit_n_iters, weights, biases
+        return fit_n_iters_list, weights, biases
 
 
 class PyTorchMpPool:
@@ -65,7 +64,7 @@ class PyTorchMpPool:
         return res
 
     def __call__(self, prob_it, **kwargs):
-        max_lr_fit_n_iters = 0
+        fit_n_iters_list = []
         weights = []
         biases = []
         self.kwargs = kwargs
@@ -74,11 +73,10 @@ class PyTorchMpPool:
             if result is None:
                 continue
             weight, bias, lr_fit_n_iters = result
-            if lr_fit_n_iters > max_lr_fit_n_iters:
-                max_lr_fit_n_iters = lr_fit_n_iters
+            fit_n_iters_list.append(lr_fit_n_iters)
             weights.append(weight)
             biases.append(bias)
-        return max_lr_fit_n_iters, weights, biases
+        return fit_n_iters_list, weights, biases
 
 
 class SerialRunner:
@@ -89,7 +87,7 @@ class SerialRunner:
         pass
 
     def __call__(self, prob_it, **kwargs):
-        max_lr_fit_n_iters = 0
+        fit_n_iters_list = []
         weights = []
         biases = []
         for feats_support, gt_support in prob_it:
@@ -97,11 +95,10 @@ class SerialRunner:
             if result is None:
                 continue
             weight, bias, lr_fit_n_iters = result
-            if lr_fit_n_iters > max_lr_fit_n_iters:
-                max_lr_fit_n_iters = lr_fit_n_iters
+            fit_n_iters_list.append(lr_fit_n_iters)
             weights.append(weight)
             biases.append(bias)
-        return max_lr_fit_n_iters, weights, biases
+        return fit_n_iters_list, weights, biases
 
 
 class ChunkRunner:
@@ -115,7 +112,7 @@ class ChunkRunner:
         pass
 
     def __call__(self, prob_it, **kwargs):
-        max_lr_fit_n_iters = 0
+        fit_n_iters_list = []
         weights = []
         biases = []
         for chunk in chunked(prob_it, self.chunk_size):
@@ -125,11 +122,10 @@ class ChunkRunner:
                 torch.stack(gt_support, axis=0),
                 **kwargs,
             )
-            if lr_fit_n_iters > max_lr_fit_n_iters:
-                max_lr_fit_n_iters = lr_fit_n_iters
+            fit_n_iters_list.append(lr_fit_n_iters)
             weights.append(weight)
             biases.append(bias)
-        return max_lr_fit_n_iters, weights, biases
+        return fit_n_iters_list, weights, biases
 
 
 class CopyWrapper:
@@ -150,10 +146,10 @@ class CopyWrapper:
                     initial_device = feats_support.device
                 yield feats_support.to(self.device), gt_support.to(self.device)
 
-        max_lr_fit_n_iters, weights, biases = self.runner(wrapped_it(), **kwargs)
+        fit_n_iters_list, weights, biases = self.runner(wrapped_it(), **kwargs)
         assert initial_device is not None
         return (
-            max_lr_fit_n_iters,
+            fit_n_iters_list,
             [weight.to(initial_device) for weight in weights],
             [bias.to(initial_device) for bias in biases],
         )

@@ -45,11 +45,11 @@ def main(method, outfn, n_jobs, device):
 
     def run_once(timer_msg, outfn=None):
         with Timer(timer_msg):
-            max_lr_fit_n_iters, weights_list, biases_list = runner(prob_it())
+            fit_n_iters_list, weights_list, biases_list = runner(prob_it())
         if outfn:
             weights = torch.vstack(weights_list)
             biases = torch.vstack(biases_list)[:, 0]
-            torch.save((max_lr_fit_n_iters, weights, biases), outfn)
+            torch.save((fit_n_iters_list, weights, biases), outfn)
 
     try:
         run_once("Cold start 1024")

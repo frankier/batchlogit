@@ -5,7 +5,7 @@ import torch
 cpu_dev = torch.device("cpu")
 
 for idx, fn in enumerate(sys.argv[1:]):
-    max_lr_fit_n_iters, weights, biases = torch.load(fn, cpu_dev)
+    fit_n_iters_list, weights, biases = torch.load(fn, cpu_dev)
     print(fn)
     print(weights)
     print(biases)
@@ -15,11 +15,11 @@ print("***")
 print()
 
 for idx, fn in enumerate(sys.argv[1:]):
-    max_lr_fit_n_iters, weights, biases = torch.load(fn, cpu_dev)
+    fit_n_iters_list, weights, biases = torch.load(fn, cpu_dev)
     for other_idx, other_fn in enumerate(sys.argv[1:]):
         if other_idx >= idx:
             continue
-        other_max_lr_fit_n_iters, other_weights, other_biases = torch.load(
+        other_fit_n_iters_list, other_weights, other_biases = torch.load(
             other_fn, cpu_dev
         )
         print(f"Difference between {fn} and {other_fn}")
